@@ -10,7 +10,7 @@ import {
     NotAuthorizedException,
     UserNotFoundException,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { HttpException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 
 
 const accessKey = process.env.AWS_ACCESS_KEY_ID;
@@ -27,6 +27,7 @@ const clientConfig: CognitoIdentityProviderClientConfig = {
 
 const client = new CognitoIdentityProviderClient(clientConfig);
 
+@Injectable()
 export class AuthService {
 
     
