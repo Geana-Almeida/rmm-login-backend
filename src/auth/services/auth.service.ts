@@ -88,7 +88,7 @@ export class AuthService {
 
         try {
             const response = await client.send(command);
-            return await client.send(command2);
+            return await client.send(command);
 
         } 
         catch (error) {
