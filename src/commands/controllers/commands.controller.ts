@@ -9,18 +9,18 @@ export class CommandsController{
 
     @UseGuards(JwtAuthGuard)
     @Post("add-command")
-    addCommand(
+    async addCommand(
     @Body("action") action: string, 
     @Body("params") params: any,
     
 ){
-        const newCommand = this.commandsQueued.addCommand(action, params);
+        const newCommand = await this.commandsQueued.addCommand(action, params);
         return newCommand; 
     }
 
     @UseGuards(JwtAuthGuard)
     @Get("next-command")
-    getNextCommand(){
-        return this.commandsQueued.getNextCommand();
+    async getNextCommand(){
+        return await this.commandsQueued.getNextCommand();
     }
 }
