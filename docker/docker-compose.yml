@@ -13,5 +13,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - DEFAULT_REGION=us-east-1
     volumes:
-      - './localstack:/var/lib/localstack'  # Persistência de dados 
+      - localstack-data:/var/lib/localstack  # Persistência de dados 
 
+volumes:
+  localstack-data:
