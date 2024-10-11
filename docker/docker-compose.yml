@@ -7,13 +7,13 @@ services:
     ports:
       - "4566:4566"  
     environment:
-      - SERVICES=sqs    # Serviços que queremos habilitar
+      - SERVICES=sqs    # Serviço do SQS
       - EDGE_PORT=4566
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - DEFAULT_REGION=us-east-1
     volumes:
-      - localstack-data:/var/lib/localstack  # Persistência de dados 
+      - localstack-data:/var/lib/localstack  
 
 volumes:
   localstack-data:
