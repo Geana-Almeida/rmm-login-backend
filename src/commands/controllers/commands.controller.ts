@@ -23,11 +23,4 @@ export class CommandsController{
     getNextCommand(){
         return this.commandsQueued.getNextCommand();
     }
-
-    @UseGuards(JwtAuthGuard)
-    @Get("all-commands")
-    getAllCommands(){
-        return this.commandsQueued.getAllCommands();
-    }
-
 }

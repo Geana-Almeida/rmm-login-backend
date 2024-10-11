@@ -27,9 +27,4 @@ export class CommandsService {
 
         return this.commandQueue.shift();
     }
-
-    getAllCommands(): Commands[]{
-        return this.commandQueue;
-    }
-
 }
