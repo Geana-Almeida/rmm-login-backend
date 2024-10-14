@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Commands } from "../models/command.model"
+import { Commands } from "@prisma/client"
 import { SQSClient, SendMessageCommand, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { MachinesService } from "src/machines/service/machines.service";
+import { PrismaService } from "prisma/service/prisma.service";
 
 const sqsClient = new SQSClient({
     region: 'us-east-1',
@@ -15,18 +16,22 @@ const sqsClient = new SQSClient({
 @Injectable()
 export class CommandsService {
 
-  constructor(private readonly machinesService: MachinesService){}
+  constructor(
+    private prisma: PrismaService,
+    private readonly machinesService: MachinesService){}
 
     async addCommand(action: string, params: any, machineId: string): Promise<Commands> {
 
       const machineIp = await this.machinesService.getMachineIp(machineId);
 
-        const newCommand: Commands = {
+        const newCommand: Commands = await this.prisma.commands.create({
+          data: {
             machineIp,
             action,
             params,
             status: "queued"
-        } as Commands;
+          }
+      });
         
         const command = new SendMessageCommand({
             QueueUrl: process.env.SQS_QUEUE_URL,
@@ -55,7 +60,7 @@ export class CommandsService {
       
           await sqsClient.send(
             new DeleteMessageCommand({
-              QueueUrl: process.env.SQS_QUEUE_URL,
+              QueueUrl: process.env.SQS_RESPONSE_URL,
               ReceiptHandle: message.ReceiptHandle,
             })
           );

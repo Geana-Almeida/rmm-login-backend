@@ -1,18 +1,17 @@
 import { Injectable } from "@nestjs/common"
-import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
-import { Machines } from "../model/machines.model"
+import { PrismaService } from "prisma/service/prisma.service";
+import { Machine } from "@prisma/client";
+
 
 @Injectable()
 export class MachinesService{
     constructor(
-        @InjectRepository(Machines)
-        private readonly machinesRepository: Repository<Machines>
+        private prisma: PrismaService,
     ){}
 
     async getMachineIp(machineId: string): Promise<string> {
-        
-        const machine = await this.machinesRepository.findOne({
+
+        const machine: Machine = await this.prisma.machine.findUnique({
             where: {id: machineId}
         });
 
