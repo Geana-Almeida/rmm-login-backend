@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Commands } from "../models/command.model"
-import { v4 as uuidv4 } from 'uuid';
 import { SQSClient, SendMessageCommand, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
+import { MachinesService } from "src/machines/service/machines.service";
 
 const sqsClient = new SQSClient({
     region: 'us-east-1',
@@ -15,14 +15,18 @@ const sqsClient = new SQSClient({
 @Injectable()
 export class CommandsService {
 
-    async addCommand(action: string, params: any): Promise<Commands> {
+  constructor(private readonly machinesService: MachinesService){}
+
+    async addCommand(action: string, params: any, machineId: string): Promise<Commands> {
+
+      const machineIp = await this.machinesService.getMachineIp(machineId);
+
         const newCommand: Commands = {
-            id: uuidv4(),
+            machineIp,
             action,
             params,
-            createdAt: new Date(),
             status: "queued"
-        };
+        } as Commands;
         
         const command = new SendMessageCommand({
             QueueUrl: process.env.SQS_QUEUE_URL,
@@ -33,10 +37,10 @@ export class CommandsService {
         return newCommand;
     }
 
-    async getNextCommand(): Promise<Commands | string>{
+    async getResponseCommand(): Promise<Commands | string>{
 
         const command = new ReceiveMessageCommand({
-            QueueUrl: process.env.SQS_QUEUE_URL,
+            QueueUrl: process.env.SQS_RESPONSE_URL, 
             MaxNumberOfMessages: 1,
           });
       

@@ -12,15 +12,15 @@ export class CommandsController{
     async addCommand(
     @Body("action") action: string, 
     @Body("params") params: any,
-    
+    @Body("machineId") machineId: string
 ){
-        const newCommand = await this.commandsQueued.addCommand(action, params);
+        const newCommand = await this.commandsQueued.addCommand(action, params, machineId);
         return newCommand; 
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get("next-command")
-    async getNextCommand(){
-        return await this.commandsQueued.getNextCommand();
+    @Get("next-response")
+    async getNextResponse(){
+        return await this.commandsQueued.getResponseCommand();
     }
 }
