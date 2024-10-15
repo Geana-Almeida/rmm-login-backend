@@ -13,14 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Commands {
-  id         String   @id @default(uuid())
-  machineIp  String
-  action     String
-  params     Json
-  createdAt  DateTime @default(now())
-  status     String
-}
+//model Commands {
+  //id         String   @id @default(uuid())
+  //machineIp  String
+  //action     String
+  //params     Json
+  //createdAt  DateTime @default(now())
+  //status     String
+//}
 
 model Machine {
   id        String   @id @default(uuid())

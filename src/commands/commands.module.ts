@@ -12,6 +12,3 @@ import { MachinesService } from 'src/machines/service/machines.service';
   controllers: [CommandsController],
 })
 export class CommandsModule {}
-
-
-
