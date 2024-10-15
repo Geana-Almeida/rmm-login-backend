@@ -24,7 +24,7 @@ export class CommandsService {
 
       const machineIp = await this.machinesService.getMachineIp(machineId);
 
-        const newCommand: Command = new Command(machineId, action, params, 'queued');
+        const newCommand: Command = new Command(machineIp, action, params, 'queued');
 
         const command = new SendMessageCommand({
             QueueUrl: process.env.SQS_QUEUE_URL,
