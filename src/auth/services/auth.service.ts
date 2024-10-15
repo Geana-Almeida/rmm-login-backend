@@ -31,7 +31,7 @@ const client = new CognitoIdentityProviderClient(clientConfig);
 export class AuthService {
 
     
-    async createUser(username: string, password:string){
+    async createUser(name: string, username: string, password:string){
         const createUserCommand = new AdminCreateUserCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             Username: username,
@@ -40,6 +40,10 @@ export class AuthService {
                 {
                     Name: 'email',
                     Value: username
+                },
+                {
+                    Name: 'name',
+                    Value: name
                 }
             ]
         });
