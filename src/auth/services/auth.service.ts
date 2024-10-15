@@ -62,6 +62,10 @@ export class AuthService {
                 {
                     Name: 'email_verified',
                     Value: 'true'
+                },
+                {
+                    Name: 'name',
+                    Value: name
                 }
             ]
         });
