@@ -11,6 +11,11 @@ export class MachineController {
     return this.machineService.getAllMachines();
   }
 
+  @Get("/active")
+  async getActiveMachines(): Promise<agent[]> {
+    return this.machineService.getActiveMachines();
+  }
+
   @Get("/:id")
   async getMachine(@Param('id') id: string): Promise<agent> {
     return this.machineService.getMachineById(id);
