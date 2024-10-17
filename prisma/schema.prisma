@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,16 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//model Commands {
-  //id         String   @id @default(uuid())
-  //machineIp  String
-  //action     String
-  //params     Json
-  //createdAt  DateTime @default(now())
-  //status     String
-//}
-
-model Machine {
-  id        String   @id @default(uuid())
-  ipAddress String   @unique
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model agent {
+  id         String    @id @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(6)
+  ip_address String?   @unique(map: "ukq5ypy1ak6awk0m836khfdvspu") @db.VarChar(255)
+  status     String?   @db.VarChar(255)
+  username   String?   @db.VarChar(255)
 }
