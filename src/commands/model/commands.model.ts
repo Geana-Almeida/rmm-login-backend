@@ -1,22 +1,21 @@
 import { v4 as uuidv4 } from 'uuid'
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class Command {
+    @IsUUID()
     id: string;
-    @IsString()
-    @IsNotEmpty()
-    machineIp: string;
-    action: string;
-    params: any;
-    createdAt: Date;
-    status: string;
 
-    constructor(machineIp: string, action: string, params: any, status: string){
+    @IsString()
+    @IsNotEmpty({ message: 'Machine ID must not be empty' })
+    machine_id: string;
+
+    @IsString()
+    @IsNotEmpty({ message: 'Action must not be empty' })
+    action: string;
+
+    constructor(machine_id: string, action: string){
         this.id = uuidv4();
-        this.createdAt = new Date();
-        this.machineIp = machineIp;
+        this.machine_id = machine_id;
         this.action = action;
-        this.params = params;
-        this.status = status;
     }
 }
