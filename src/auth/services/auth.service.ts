@@ -63,8 +63,7 @@ export class AuthService {
         });
 
         const response = await client.send(createUserCommand);
-        await client.send(setPassword);
-        await client.send(paramsVerify);
+        console.log(response)
         return response;
         
     }
@@ -82,12 +81,15 @@ export class AuthService {
             }       
         });
 
+        const command2 = new AdminGetUserCommand({
+            UserPoolId: process.env.COGNITO_USER_POOL_ID,
+            Username: username,
+        });
+
         try {
             const response = await client.send(command);
+            return await client.send(command);
 
-            console.log("Deu certo o refresh :)")
-            
-            return response.AuthenticationResult;
         } 
         catch (error) {
             throw new HttpException('Usuario não encontrado!', 404);

@@ -6,7 +6,7 @@ import { JwtAuthGuard } from 'src/auth/jwt/jwt.auth.guard';
 export class CommandsController {
   constructor(private readonly commandService: CommandsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('send-command')
   async addCommand(
     @Body('machine_id') machineId: string,
