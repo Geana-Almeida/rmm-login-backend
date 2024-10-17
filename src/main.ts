@@ -20,7 +20,7 @@ async function bootstrap() {
   .addBearerAuth()
   .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/swagger', app, document);
+  SwaggerModule.setup('/doc', app, document);
   
 
   process.env.TZ = '-03:00';
