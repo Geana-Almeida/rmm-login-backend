@@ -1,6 +1,6 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { MachineService } from '../service/machine.service';
-import { agent } from '@prisma/client';
+import { Agent } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -13,14 +13,14 @@ export class MachineController {
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Obter todas as máquinas' })
-  async getMachines(): Promise<agent[]> {
+  async getMachines(): Promise<Agent[]> {
     return this.machineService.getAllMachines();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/active')
   @ApiOperation({ summary: 'Obter máquinas ativas' })
-  async getActiveMachines(): Promise<agent[]> {
+  async getActiveMachines(): Promise<Agent[]> {
     return this.machineService.getActiveMachines();
   }
 
@@ -28,7 +28,7 @@ export class MachineController {
   @Get('/:id')
   @ApiOperation({ summary: 'Obter uma máquina específica pelo ID' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID da máquina' })
-  async getMachine(@Param('id') id: string): Promise<agent> {
+  async getMachine(@Param('id') id: string): Promise<Agent> {
     return this.machineService.getMachineById(id);
   }
 }

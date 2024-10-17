@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "prisma/service/prisma.service";
-import { agent } from "@prisma/client";
+import { Agent } from "@prisma/client";
 
 @Injectable()
 export class MachineService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllMachines(): Promise<agent[]> {
+  async getAllMachines(): Promise<Agent[]> {
     try {
       return await this.prisma.agent.findMany();
     } catch (e) {
@@ -14,7 +14,7 @@ export class MachineService {
     }
   }
 
-  async getActiveMachines(): Promise<agent[]> {
+  async getActiveMachines(): Promise<Agent[]> {
     try {
       return await this.prisma.agent.findMany({
         where: {
@@ -26,7 +26,7 @@ export class MachineService {
     }
   }
 
-  async getMachineById(id: string): Promise<agent> {
+  async getMachineById(id: string): Promise<Agent> {
     try {
       return await this.prisma.agent.findUnique({
         where: { id }
