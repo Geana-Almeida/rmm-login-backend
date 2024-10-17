@@ -1,63 +1,75 @@
-import { Injectable } from "@nestjs/common";
-import { SQSClient, SendMessageCommand, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
-import { MachinesService } from "src/machines/service/machines.service";
-import { PrismaService } from "prisma/service/prisma.service";
-import { Command } from "../model/commands.model";
+import {
+  Injectable,
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  SQSClient,
+  SendMessageCommand,
+  ReceiveMessageCommand,
+  DeleteMessageCommand,
+} from '@aws-sdk/client-sqs';
+import { Command } from '../model/commands.model';
 
 const sqsClient = new SQSClient({
-    region: 'us-east-1',
-    endpoint: 'http://localhost:4566',
-    credentials: {
-        accessKeyId: 'test',
-        secretAccessKey: 'test'
-    }
+  region: 'us-east-1',
+  endpoint: 'https://localhost.localstack.cloud:4566',
+  credentials: {
+    accessKeyId: 'test',
+    secretAccessKey: 'test',
+  },
 });
 
 @Injectable()
 export class CommandsService {
+  async addCommand(action: string, machineId: string): Promise<Command> {
+    const newCommand: Command = new Command(machineId, action);
 
-  constructor(
-    private prisma: PrismaService,
-    private readonly machinesService: MachinesService){}
+    const sendCommand = new SendMessageCommand({
+      QueueUrl: process.env.SQS_QUEUE_URL,
+      MessageBody: JSON.stringify(newCommand),
+    });
 
-    async addCommand(action: string, params: any, machineId: string): Promise<Command> {
+    try {
+      await sqsClient.send(sendCommand);
 
-      const machineIp = await this.machinesService.getMachineIp(machineId);
+      const response = await this.waitForResponse();
 
-        const newCommand: Command = new Command(machineIp, action, params, 'queued');
-
-        const command = new SendMessageCommand({
-            QueueUrl: process.env.SQS_QUEUE_URL,
-            MessageBody: JSON.stringify(newCommand)
-        });
-
-        await sqsClient.send(command);
-        return newCommand;
+      return response;
+    } catch (e) {
+      console.error(`Error handling SQS messages: ${e}`);
+      throw new InternalServerErrorException('Error sending/receiving message from SQS.');
     }
+  }
 
-    async getResponseCommand(): Promise<Command | string>{
+  private async waitForResponse(): Promise<any> {
+    const receiveCommand = new ReceiveMessageCommand({
+      QueueUrl: process.env.SQS_RESPONSE_URL,
+      MaxNumberOfMessages: 1,
+      WaitTimeSeconds: 600,
+    });
 
-        const command = new ReceiveMessageCommand({
-            QueueUrl: process.env.SQS_RESPONSE_URL, 
-            MaxNumberOfMessages: 1,
-          });
-      
-          const response = await sqsClient.send(command);
-      
-          if (!response.Messages || response.Messages.length === 0) {
-            return 'Nenhum comando na fila';
-          }
-      
-          const message = response.Messages[0];
-          const commandData: Command = JSON.parse(message.Body);
-      
-          await sqsClient.send(
-            new DeleteMessageCommand({
-              QueueUrl: process.env.SQS_RESPONSE_URL,
-              ReceiptHandle: message.ReceiptHandle,
-            })
-          );
-      
-          return commandData;
+    try {
+      const response = await sqsClient.send(receiveCommand);
+
+      if (!response.Messages || response.Messages.length === 0) {
+        throw new BadRequestException('No messages found in the response queue.');
+      }
+
+      const message = response.Messages[0];
+      const commandResponse = JSON.parse(message.Body);
+
+      await sqsClient.send(
+        new DeleteMessageCommand({
+          QueueUrl: process.env.SQS_RESPONSE_URL,
+          ReceiptHandle: message.ReceiptHandle,
+        }),
+      );
+
+      return commandResponse;
+    } catch (e) {
+      console.error(`Error receiving response: ${e}`);
+      throw new InternalServerErrorException('Error receiving message from SQS response queue.');
     }
+  }
 }
