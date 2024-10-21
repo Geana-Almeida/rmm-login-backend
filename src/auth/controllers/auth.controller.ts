@@ -29,23 +29,25 @@ export class AuthController {
     return this.authService.authenticateUser(username, password);
   }
 
-  @UseGuards(JwtAuthGuard)
+  
   @Post('register')
   @ApiOperation({ summary: 'Registrar um novo usuário' })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
+        name: { type: 'string', description: 'Nome do usuário' },
         username: { type: 'string', description: 'Nome de usuário' },
         password: { type: 'string', description: 'Senha do usuário' },
       },
-      required: ['username', 'password'],
+      required: ['name','username', 'password'],
     },
   })
   async register(
     @Body('username') username: string,
     @Body('password') password: string,
+    @Body('name') name: string
   ) {
-    return this.authService.createUser(username, password);
+    return this.authService.createUser(name, username, password);
   }
 }
