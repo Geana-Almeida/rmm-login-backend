@@ -1,22 +1,19 @@
 import { Module } from '@nestjs/common';
+import { PrismaModule } from 'prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { CommandsModule } from './commands/commands.module';
+import { MachinesModule } from './machines/machines.module';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProdService } from './data/services/prod.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRootAsync({
-	    useClass: ProdService,
-      imports: [ConfigModule],
-    }),
     AuthModule,
-    CommandsModule
+    PrismaModule,
+    MachinesModule,
+    CommandsModule,
   ],
-  controllers: [AppController],
-  providers: [],
+  providers: [AppController],
 })
 export class AppModule {}

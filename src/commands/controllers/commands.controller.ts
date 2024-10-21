@@ -1,33 +1,40 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
-import { CommandsService } from "../services/commands.service";
-import { JwtAuthGuard } from "src/auth/jwt/jwt.auth.guard";
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { CommandsService } from '../services/commands.service';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.auth.guard';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-@Controller("command")
-export class CommandsController{
+@ApiTags('Command')
+@Controller()
+export class CommandsController {
+  constructor(private readonly commandService: CommandsService) {}
 
-    constructor(private readonly commandsQueued: CommandsService){}
+  @UseGuards(JwtAuthGuard)
+  @Post('send-command')
+  @ApiOperation({ summary: 'Enviar um comando para uma máquina' })
+  @ApiBearerAuth()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        machine_id: { type: 'string', description: 'ID da máquina alvo' },
+        action: {
+          type: 'string',
+          description: 'Ação a ser executada pela máquina',
+        },
+      },
+      required: ['machine_id', 'action'],
+    },
+  })
+  async addCommand(
+    @Body('machine_id') machineId: string,
+    @Body('action') action: string,
+  ) {
+    return await this.commandService.addCommand(action, machineId);
+  }
 
-    @UseGuards(JwtAuthGuard)
-    @Post("add-command")
-    addCommand(
-    @Body("action") action: string, 
-    @Body("params") params: any,
-    
-){
-        const newCommand = this.commandsQueued.addCommand(action, params);
-        return newCommand; 
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get("next-command")
-    getNextCommand(){
-        return this.commandsQueued.getNextCommand();
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get("all-commands")
-    getAllCommands(){
-        return this.commandsQueued.getAllCommands();
-    }
-
+  //   @UseGuards(JwtAuthGuard)
+  // @Get('get-response')
+  // async getNextResponse() {
+  //   return await this.commandService.getResponseCommand();
+  // }
 }
