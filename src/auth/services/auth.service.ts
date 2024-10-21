@@ -31,7 +31,7 @@ const client = new CognitoIdentityProviderClient(clientConfig);
 export class AuthService {
 
     
-    async createUser(name:string ,username: string, password:string){
+    async createUser(name: string, username: string, password: string) {
         const createUserCommand = new AdminCreateUserCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             Username: username,
@@ -45,16 +45,24 @@ export class AuthService {
                     Name: 'name',
                     Value: name
                 }
-            ]
+            ],
+            MessageAction: 'SUPPRESS' // Isso suprime o envio de e-mail com a senha temporária.
         });
-
+    
+        const response = await client.send(createUserCommand);
+        console.log(response);
+    
+        // Define a senha como permanente
         const setPassword = new AdminSetUserPasswordCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             Username: username,
             Password: password,
             Permanent: true
         });
-
+    
+        await client.send(setPassword);
+    
+        // Atualiza o atributo de verificação de e-mail
         const paramsVerify = new AdminUpdateUserAttributesCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             Username: username,
@@ -69,13 +77,11 @@ export class AuthService {
                 }
             ]
         });
-
-        const response = await client.send(createUserCommand);
-        console.log(response)
-        return response;
+    
+        await client.send(paramsVerify);
         
+        return response;
     }
-
     
 
     async authenticateUser(username: string, password: string) {
@@ -89,13 +95,12 @@ export class AuthService {
             }       
         });
 
-        const command2 = new AdminGetUserCommand({
+        const userCommand = new AdminGetUserCommand({
             UserPoolId: process.env.COGNITO_USER_POOL_ID,
             Username: username,
         });
 
         try {
-            
             const response = await client.send(command);
             return await client.send(command);
 
