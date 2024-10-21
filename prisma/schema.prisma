@@ -8,7 +8,7 @@ datasource db {
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model Agent {
+model agent {
   id         String    @id @db.VarChar(255)
   created_at DateTime? @db.Timestamp(6)
   ip_address String?   @unique(map: "ukq5ypy1ak6awk0m836khfdvspu") @db.VarChar(255)
