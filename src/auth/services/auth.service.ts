@@ -95,14 +95,27 @@ export class AuthService {
             }       
         });
 
-        const userCommand = new AdminGetUserCommand({
-            UserPoolId: process.env.COGNITO_USER_POOL_ID,
-            Username: username,
-        });
-
+        
         try {
-            const response = await client.send(command);
-            return await client.send(command);
+            const authResponse = await client.send(command);
+
+            const userCommand = new AdminGetUserCommand({
+                UserPoolId: process.env.COGNITO_USER_POOL_ID,
+                Username: username,
+            });
+
+            const userResponse = await client.send(userCommand);
+
+            const userSub = userResponse.UserAttributes.find(attr => attr.Name === 'sub')?.Value || "";
+
+
+            return {
+                id: userSub, // ID do usuário
+                name: userResponse.UserAttributes.find(attr => attr.Name === 'name')?.Value || "",
+                username: username,
+                password: "",
+                token: authResponse.AuthenticationResult.IdToken // Token de autenticação
+            };
 
         } 
         catch (error) {
