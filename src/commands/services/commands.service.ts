@@ -23,7 +23,7 @@ const sqsClient = new SQSClient({
 @Injectable()
 export class CommandsService {
   async addCommand(action: string, machineId: string): Promise<Command> {
-    const newCommand: Command = new Command(machineId, action);
+    const newCommand: Command = new Command(machineId, `cmd: ${action}`);
 
     const sendCommand = new SendMessageCommand({
       QueueUrl: process.env.SQS_QUEUE_URL,
